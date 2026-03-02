@@ -1,0 +1,6 @@
+{
+  "integration_token": "ntn_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+  "database_id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "callback_interval": 10,
+  "callback_jitter": 10
+}
