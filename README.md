@@ -67,14 +67,13 @@ A `config.json.example` is provided as a reference template.
 
 ```bash
 cd /path/to/Mythic
-./mythic-cli install github https://github.com/<you>/notion-c2
+./mythic-cli install github https://github.com/0xbbuddha/notion
 ```
 
 Or manually:
 
 ```bash
-cp -r notion/ /path/to/Mythic/InstalledServices/notion
-./mythic-cli start notion
+./mythic-cli install folder /path/to/notion
 ```
 
 ---
