@@ -5,6 +5,6 @@
   "exclude_documentation_c2": false,
   "exclude_agent_icons": true,
   "remote_images": {
-    "notion": "ghcr.io/0xbbuddha/notion-c2:latest"
+    "notion": "ghcr.io/0xbbuddha/notion:v1.0.2"
   }
 }
