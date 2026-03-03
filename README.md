@@ -41,6 +41,7 @@ Create a new Notion database (full-page) with the following properties:
 | `direction`   | Select   | Options: `in`, `out`                   |
 | `agent_id`    | Text     | UUID of the agent                      |
 | `processed`   | Checkbox | Checked once the message is consumed   |
+| `size`        | Number   | Decoded payload size in bytes          |
 
 > The `created_time` property is added automatically by Notion.
 
@@ -111,7 +112,7 @@ See `C2_Profiles/notion/c2_code/notion_client.py` for a reference implementation
 
 - Notion API rate limit: ~3 req/s — keep `callback_interval` ≥ 5s
 - Large payloads are chunked into 1800-char blocks automatically
-- Notion free plan has no hard storage limit but archiving old pages is recommended for long operations
+- Processed pages are archived automatically — inbound pages are archived immediately after processing, outbound pages are archived once the agent marks them as consumed
 
 ---
 
