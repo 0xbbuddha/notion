@@ -71,6 +71,7 @@ class NotionClient:
                     "rich_text": [{"text": {"content": agent_id}}]
                 },
                 "processed": {"checkbox": False},
+                "size": {"number": len(data)},
             },
             "children": children,
         }
@@ -140,6 +141,11 @@ class NotionClient:
         raw_text = raw_b64.decode("utf-8", errors="replace").strip()
         chunks = [raw_text[i : i + CHUNK_SIZE] for i in range(0, len(raw_text), CHUNK_SIZE)]
 
+        try:
+            decoded_size = len(base64.b64decode(raw_text))
+        except Exception:
+            decoded_size = len(raw_text)
+
         children = [
             {
                 "object": "block",
@@ -163,6 +169,7 @@ class NotionClient:
                     "rich_text": [{"text": {"content": agent_id}}]
                 },
                 "processed": {"checkbox": False},
+                "size": {"number": decoded_size},
             },
             "children": children,
         }
@@ -178,15 +185,49 @@ class NotionClient:
             return resp.json()["id"]
 
     async def mark_processed(self, page_id: str) -> None:
-        """Mark a page as processed so it won't be picked up again."""
+        """Mark a page as processed and archive it so it disappears from the database view."""
         async with httpx.AsyncClient() as client:
             resp = await client.patch(
                 f"{NOTION_API_BASE}/pages/{page_id}",
                 headers=self.headers,
-                json={"properties": {"processed": {"checkbox": True}}},
+                json={
+                    "properties": {"processed": {"checkbox": True}},
+                    "archived": True,
+                },
                 timeout=30.0,
             )
             resp.raise_for_status()
+
+    async def archive_page(self, page_id: str) -> None:
+        """Archive a page without changing its properties."""
+        async with httpx.AsyncClient() as client:
+            resp = await client.patch(
+                f"{NOTION_API_BASE}/pages/{page_id}",
+                headers=self.headers,
+                json={"archived": True},
+                timeout=30.0,
+            )
+            resp.raise_for_status()
+
+    async def query_processed_out(self) -> list:
+        """Return all direction=out pages already marked processed by the agent."""
+        payload = {
+            "filter": {
+                "and": [
+                    {"property": "direction", "select": {"equals": "out"}},
+                    {"property": "processed", "checkbox": {"equals": True}},
+                ]
+            },
+        }
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(
+                f"{NOTION_API_BASE}/databases/{self.database_id}/query",
+                headers=self.headers,
+                json=payload,
+                timeout=30.0,
+            )
+            resp.raise_for_status()
+            return resp.json().get("results", [])
 
     # ------------------------------------------------------------------
     # Helpers

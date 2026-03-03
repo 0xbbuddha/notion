@@ -153,6 +153,15 @@ async def poll_loop(notion: NotionClient, interval: int, jitter: int) -> None:
         except Exception as e:
             logger.error(f"Error in poll loop: {e}", exc_info=True)
 
+        try:
+            stale = await notion.query_processed_out()
+            for page in stale:
+                await notion.archive_page(page["id"])
+            if stale:
+                logger.debug(f"Archived {len(stale)} processed outbound page(s)")
+        except Exception as e:
+            logger.error(f"Error during outbound cleanup: {e}", exc_info=True)
+
         await asyncio.sleep(compute_sleep(interval, jitter))
 
 
