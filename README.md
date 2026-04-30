@@ -1,4 +1,4 @@
-# notion-c2
+# NotionC2
 
 A [Mythic](https://github.com/its-a-feature/Mythic) C2 profile that uses **Notion** as a covert communication channel.
 
